@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Sticker Exchange - Neo Heisei</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Mochiy+Pop+One&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <h1>✨ AI Sticker ✨</h1>
+            <p class="subtitle">Exchange & Collect!</p>
+        </header>
+
+        <main id="main-content">
+            <!-- Sections will be toggled via JS -->
+            
+            <!-- GENERATE SECTION -->
+            <section id="section-generate" class="active-section">
+                <div class="gacha-container">
+                    <div class="gacha-machine">
+                        <div class="gacha-orb" id="gacha-orb">?</div>
+                    </div>
+                    <button id="btn-generate" class="action-btn primary-btn">
+                        <span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>
+                    </button>
+                    <div id="generation-result" class="hidden">
+                        <div class="sticker-reveal">
+                            <img id="new-sticker-img" src="" alt="New Sticker">
+                            <div class="shine-effect"></div>
+                        </div>
+                        <p class="reveal-text">You got a new sticker!</p>
+                        <button id="btn-save-sticker" class="action-btn secondary-btn">Save to Book</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- STICKER BOOK SECTION -->
+            <section id="section-book" class="hidden">
+                <h2>My Sticker Book</h2>
+                <div id="sticker-grid" class="sticker-grid">
+                    <!-- Stickers will be injected here -->
+                    <div class="empty-state">No stickers yet! Go generate some!</div>
+                </div>
+            </section>
+
+            <!-- EXCHANGE SECTION -->
+            <section id="section-exchange" class="hidden">
+                <h2>Sticker Exchange</h2>
+                <div class="exchange-area">
+                    <div class="exchange-slot" id="give-slot">
+                        <p>Give</p>
+                        <div class="slot-placeholder" id="give-placeholder">+ Select</div>
+                        <img id="give-img" class="hidden" src="" alt="">
+                    </div>
+                    <div class="exchange-arrow">⇄</div>
+                    <div class="exchange-slot" id="receive-slot">
+                        <p>Get</p>
+                        <div class="slot-placeholder">?</div>
+                        <img id="receive-img" class="hidden" src="" alt="">
+                    </div>
+                </div>
+                <button id="btn-exchange" class="action-btn primary-btn" disabled>EXCHANGE!</button>
+                
+                <!-- Selection Modal (Hidden by default) -->
+                <div id="selection-modal" class="modal hidden">
+                    <div class="modal-content">
+                        <h3>Select Sticker to Give</h3>
+                        <div id="modal-sticker-grid" class="sticker-grid small-grid"></div>
+                        <button id="btn-close-modal" class="close-btn">Cancel</button>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="bottom-nav">
+            <button class="nav-item active" data-target="section-generate">
+                <span class="nav-icon">✨</span>
+                <span class="nav-label">Make</span>
+            </button>
+            <button class="nav-item" data-target="section-book">
+                <span class="nav-icon">📒</span>
+                <span class="nav-label">Book</span>
+            </button>
+            <button class="nav-item" data-target="section-exchange">
+                <span class="nav-icon">🤝</span>
+                <span class="nav-label">Trade</span>
+            </button>
+        </nav>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
