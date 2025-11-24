@@ -102,7 +102,7 @@ function setupGeneration() {
             const fullPrompt = `${systemPrompt}, ${promptText}`;
             const encodedPrompt = encodeURIComponent(fullPrompt);
             const seed = Math.floor(Math.random() * 10000);
-            const url = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${seed}&model=flux`;
+            const url = `https://pollinations.ai/p/${encodedPrompt}?width=600&height=600&seed=${seed}&model=flux`;
 
             // Load image directly (Bypass CORS fetch restriction)
             const tempImg = new Image();
