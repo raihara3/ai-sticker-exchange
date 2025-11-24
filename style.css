@@ -22,10 +22,15 @@ body {
     background: var(--bg-gradient);
     color: var(--text-color);
     min-height: 100vh;
+    overflow: hidden; /* Prevent scrolling on body, handle in app-container */
+}
+
+.layout-wrapper {
     display: flex;
     justify-content: center;
     align-items: center;
-    overflow: hidden; /* Prevent scrolling on body, handle in app-container */
+    width: 100%;
+    height: 100vh;
 }
 
 .app-container {
@@ -215,10 +220,46 @@ section {
     border: 2px solid white;
     cursor: pointer;
     transition: transform 0.2s;
+    position: relative; /* For absolute positioning of delete btn */
 }
 
 .sticker-item:hover {
     transform: scale(1.05);
+}
+
+.sticker-delete-btn {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #ff6b6b;
+    color: white;
+    border: 2px solid white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 14px;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    z-index: 10;
+}
+
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
 }
 
 .sticker-item img {
@@ -394,4 +435,73 @@ section {
     flex-direction: column;
     align-items: center;
     gap: 10px;
+}
+
+.result-actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    width: 100%;
+    margin-top: 15px;
+}
+
+/* Detail Modal */
+.detail-content {
+    position: relative;
+    align-items: center;
+    padding-top: 40px;
+}
+
+.close-btn-top {
+    position: absolute;
+    top: 10px;
+    right: 0;
+    background: none;
+    border: none;
+    font-size: 2rem;
+    color: #fff;
+    cursor: pointer;
+    line-height: 1;
+}
+
+.detail-image-container {
+    width: 100%;
+    max-width: 300px;
+    aspect-ratio: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.detail-image-container img {
+    max-width: 100%;
+    max-height: 100%;
+    filter: drop-shadow(0 5px 15px rgba(0,0,0,0.2));
+}
+
+.text-btn {
+    background: none;
+    border: none;
+    box-shadow: none;
+    padding: 10px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    text-decoration: underline;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.text-btn:hover {
+    opacity: 1;
+    transform: none;
+}
+
+.danger-text-btn {
+    color: #ff6b6b;
+}
+
+.danger-text-btn:hover {
+    color: #ff4757;
+    background: none;
 }

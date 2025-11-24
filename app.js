@@ -23,6 +23,9 @@ const btnGenerate = document.getElementById('btn-generate');
 const generationResult = document.getElementById('generation-result');
 const newStickerImg = document.getElementById('new-sticker-img');
 const btnSaveSticker = document.getElementById('btn-save-sticker');
+const btnDiscardSticker = document.getElementById('btn-discard-sticker');
+const gachaMachine = document.querySelector('.gacha-machine');
+const inputContainer = document.querySelector('.input-container');
 const stickerGrid = document.getElementById('sticker-grid');
 
 // Exchange Elements
@@ -41,7 +44,18 @@ const scanStatus = document.getElementById('scan-status');
 let html5QrCode = null;
 const stickerPrompt = document.getElementById('sticker-prompt');
 
+// Detail Modal Elements
+const detailModal = document.getElementById('detail-modal');
+const detailImg = document.getElementById('detail-img');
+const btnCloseDetail = document.getElementById('btn-close-detail');
+const btnDeleteSticker = document.getElementById('btn-delete-sticker');
+const detailActionsDefault = document.getElementById('detail-actions-default');
+const detailActionsConfirm = document.getElementById('detail-actions-confirm');
+const btnConfirmDelete = document.getElementById('btn-confirm-delete');
+const btnCancelDelete = document.getElementById('btn-cancel-delete');
+
 let selectedStickerIndex = null;
+let currentDetailIndex = null;
 
 // Initialization
 function init() {
@@ -108,7 +122,7 @@ function setupGeneration() {
             // System prompt: Heisei style, sticker, white background
             // Using 'flux' model for better quality
             // Translate keywords to English for better model understanding
-            const systemPrompt = "sticker style, vector illustration, white background, flat color, pop, no shadow";
+            const systemPrompt = "sticker style, vector illustration, background transparency, flat color, pop, no shadow";
             const fullPrompt = `${systemPrompt}, ${promptText}`;
             const encodedPrompt = encodeURIComponent(fullPrompt);
             const seed = Math.floor(Math.random() * 10000);
@@ -121,6 +135,8 @@ function setupGeneration() {
                 newStickerImg.src = url;
                 generationResult.classList.remove('hidden');
                 btnGenerate.classList.add('hidden');
+                gachaMachine.classList.add('hidden'); // Hide gacha machine
+                inputContainer.classList.add('hidden'); // Hide input container
                 
                 // Setup save button
                 btnSaveSticker.onclick = () => {
@@ -131,6 +147,12 @@ function setupGeneration() {
                         prompt: promptText
                     });
                     saveState();
+                    alert('Saved to Sticker Book!');
+                    resetGeneration();
+                };
+
+                // Setup discard button
+                btnDiscardSticker.onclick = () => {
                     resetGeneration();
                 };
             };
@@ -138,9 +160,7 @@ function setupGeneration() {
             tempImg.onerror = () => {
                 console.error('Image load failed');
                 alert('画像の生成に失敗しました。もう一度試してみてください。');
-                btnGenerate.disabled = false;
-                btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
-                stickerPrompt.disabled = false;
+                resetGeneration();
             };
 
             tempImg.src = url;
@@ -148,9 +168,7 @@ function setupGeneration() {
         } catch (error) {
             console.error('Generation setup failed:', error);
             alert('エラーが発生しました: ' + error.message);
-            btnGenerate.disabled = false;
-            btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
-            stickerPrompt.disabled = false;
+            resetGeneration();
         }
     });
 }
@@ -158,13 +176,19 @@ function setupGeneration() {
 function resetGeneration() {
     generationResult.classList.add('hidden');
     btnGenerate.classList.remove('hidden');
-    btnGenerate.disabled = false;
-    btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
-    stickerPrompt.value = ''; // Clear prompt
+    gachaMachine.classList.remove('hidden'); // Show gacha machine
+    inputContainer.classList.remove('hidden'); // Show input container
     
-    // Switch to book view to show the new sticker
-    document.querySelector('[data-target="section-book"]').click();
+    btnGenerate.disabled = false;
+    btnGenerate.innerHTML = 'MAKE STICKER'; // Reverted icon to match user edit if needed, or keep original. User removed icons in previous edit.
+    
+    stickerPrompt.disabled = false;
+    stickerPrompt.value = ''; // Clear prompt
+    stickerPrompt.focus();
+    // Do NOT switch to book view automatically to allow continuous generation
 }
+
+
 
 // Sticker Book Logic
 function renderStickerBook() {
@@ -175,12 +199,55 @@ function renderStickerBook() {
         return;
     }
 
-    state.inventory.forEach(sticker => {
+    state.inventory.forEach((sticker, index) => {
         const el = document.createElement('div');
         el.className = 'sticker-item';
-        el.innerHTML = `<img src="${sticker.src}" alt="Sticker">`;
+        
+        const img = document.createElement('img');
+        img.src = sticker.src;
+        img.alt = 'Sticker';
+        
+        // Open detail modal on click
+        el.onclick = () => openDetailModal(index, sticker);
+
+        el.appendChild(img);
         stickerGrid.appendChild(el);
     });
+}
+
+function openDetailModal(index, sticker) {
+    currentDetailIndex = index;
+    detailImg.src = sticker.src;
+    detailModal.classList.remove('hidden');
+    
+    // Reset to default view
+    detailActionsDefault.classList.remove('hidden');
+    detailActionsConfirm.classList.add('hidden');
+    
+    // Setup delete button (Show confirmation)
+    btnDeleteSticker.onclick = () => {
+        detailActionsDefault.classList.add('hidden');
+        detailActionsConfirm.classList.remove('hidden');
+    };
+
+    // Confirm Delete
+    btnConfirmDelete.onclick = () => {
+        state.inventory.splice(currentDetailIndex, 1);
+        saveState();
+        renderStickerBook();
+        detailModal.classList.add('hidden');
+    };
+
+    // Cancel Delete
+    btnCancelDelete.onclick = () => {
+        detailActionsDefault.classList.remove('hidden');
+        detailActionsConfirm.classList.add('hidden');
+    };
+    
+    // Setup close button
+    btnCloseDetail.onclick = () => {
+        detailModal.classList.add('hidden');
+    };
 }
 
 // Exchange Logic

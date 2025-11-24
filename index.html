@@ -12,97 +12,137 @@
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 </head>
 <body>
-    <div class="app-container">
-        <header class="app-header">
-            <h1>✨ AI Sticker ✨</h1>
-            <p class="subtitle">Exchange & Collect!</p>
-        </header>
+    <div class="layout-wrapper">
+        <div class="app-container">
+            <header class="app-header">
+                <h1>✨ AI Sticker ✨</h1>
+                <p class="subtitle">Exchange & Collect!</p>
+            </header>
 
-        <main id="main-content">
-            <!-- Sections will be toggled via JS -->
-            
-            <!-- GENERATE SECTION -->
-            <section id="section-generate" class="active-section">
-                <div class="gacha-container">
-                    <div class="gacha-machine">
-                        <div class="gacha-orb" id="gacha-orb">?</div>
-                    </div>
-                    
-                    <div class="input-container">
-                        <input type="text" id="sticker-prompt" class="heisei-input" placeholder="どんなシールを作る？ (例: 猫, キラキラ)">
-                    </div>
-
-                    <button id="btn-generate" class="action-btn primary-btn">
-                        <span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>
-                    </button>
-                    <div id="generation-result" class="hidden">
-                        <div class="sticker-reveal">
-                            <img id="new-sticker-img" src="" alt="New Sticker">
-                            <div class="shine-effect"></div>
+            <main id="main-content">
+                <!-- Sections will be toggled via JS -->
+                
+                <!-- GENERATE SECTION -->
+                <section id="section-generate" class="active-section">
+                    <div class="gacha-container">
+                        <div class="gacha-machine">
+                            <div class="gacha-orb" id="gacha-orb">?</div>
                         </div>
-                        <p class="reveal-text">You got a new sticker!</p>
-                        <button id="btn-save-sticker" class="action-btn secondary-btn">Save to Book</button>
+                        
+                        <div class="input-container">
+                            <input type="text" id="sticker-prompt" class="heisei-input" placeholder="What kind of sticker should we make?">
+                        </div>
+
+                        <button id="btn-generate" class="action-btn primary-btn">
+                            MAKE STICKER
+                        </button>
+                        <div id="generation-result" class="hidden">
+                            <div class="sticker-reveal">
+                                <img id="new-sticker-img" src="" alt="New Sticker">
+                                <div class="shine-effect"></div>
+                            </div>
+                            <p class="reveal-text">You got a new sticker!</p>
+                            <div class="result-actions">
+                                <button id="btn-save-sticker" class="action-btn secondary-btn">Save to Book</button>
+                                <button id="btn-discard-sticker" class="action-btn secondary-btn" style="background: #eee; border-color: #ccc; color: #666;">Discard</button>
+                            </div>
+                        </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <!-- STICKER BOOK SECTION -->
-            <section id="section-book" class="hidden">
-                <h2>My Sticker Book</h2>
-                <div id="sticker-grid" class="sticker-grid">
-                    <!-- Stickers will be injected here -->
-                    <div class="empty-state">No stickers yet! Go generate some!</div>
-                </div>
-            </section>
-
-            <!-- EXCHANGE SECTION -->
-            <section id="section-exchange" class="hidden">
-                <h2>Sticker Exchange</h2>
-                <div class="exchange-menu">
-                    <button id="btn-mode-give" class="action-btn secondary-btn">
-                        <span class="btn-icon">📤</span> Give (Show QR)
-                    </button>
-                    <button id="btn-mode-get" class="action-btn secondary-btn">
-                        <span class="btn-icon">📥</span> Get (Scan QR)
-                    </button>
-                </div>
-
-                <!-- GIVE MODE -->
-                <div id="exchange-give" class="exchange-mode hidden">
-                    <h3>Select a sticker to give</h3>
-                    <div id="give-sticker-grid" class="sticker-grid small-grid"></div>
-                    
-                    <div id="qr-display-area" class="hidden">
-                        <div id="qrcode"></div>
-                        <p class="instruction">Scan this with another device!</p>
-                        <button id="btn-close-qr" class="close-btn">Back</button>
+                <!-- STICKER BOOK SECTION -->
+                <section id="section-book" class="hidden">
+                    <h2>My Sticker Book</h2>
+                    <div id="sticker-grid" class="sticker-grid">
+                        <!-- Stickers will be injected here -->
+                        <div class="empty-state">No stickers yet! Go generate some!</div>
                     </div>
-                </div>
+                </section>
 
-                <!-- GET MODE -->
-                <div id="exchange-get" class="exchange-mode hidden">
-                    <h3>Scan QR Code</h3>
-                    <div id="reader" style="width: 100%; max-width: 300px; margin: 0 auto;"></div>
-                    <p id="scan-status" class="instruction">Waiting for camera...</p>
-                    <button id="btn-stop-scan" class="close-btn">Stop Scanning</button>
-                </div>
-            </section>
-        </main>
+                <!-- EXCHANGE SECTION -->
+                <section id="section-exchange" class="hidden">
+                    <h2>Sticker Exchange</h2>
+                    <div class="exchange-menu">
+                        <button id="btn-mode-give" class="action-btn secondary-btn">
+                            <span class="btn-icon">📤</span> Give (Show QR)
+                        </button>
+                        <button id="btn-mode-get" class="action-btn secondary-btn">
+                            <span class="btn-icon">📥</span> Get (Scan QR)
+                        </button>
+                    </div>
 
-        <nav class="bottom-nav">
-            <button class="nav-item active" data-target="section-generate">
-                <span class="nav-icon">✨</span>
-                <span class="nav-label">Make</span>
-            </button>
-            <button class="nav-item" data-target="section-book">
-                <span class="nav-icon">📒</span>
-                <span class="nav-label">Book</span>
-            </button>
-            <button class="nav-item" data-target="section-exchange">
-                <span class="nav-icon">🤝</span>
-                <span class="nav-label">Trade</span>
-            </button>
-        </nav>
+                    <!-- GIVE MODE -->
+                    <div id="exchange-give" class="exchange-mode hidden">
+                        <h3>Select a sticker to give</h3>
+                        <div id="give-sticker-grid" class="sticker-grid small-grid"></div>
+                        
+                        <div id="qr-display-area" class="hidden">
+                            <div id="qrcode"></div>
+                            <p class="instruction">Scan this with another device!</p>
+                            <button id="btn-close-qr" class="close-btn">Back</button>
+                        </div>
+                    </div>
+
+                    <!-- GET MODE -->
+                    <div id="exchange-get" class="exchange-mode hidden">
+                        <h3>Scan QR Code</h3>
+                        <div id="reader" style="width: 100%; max-width: 300px; margin: 0 auto;"></div>
+                        <p id="scan-status" class="instruction">Waiting for camera...</p>
+                        <button id="btn-stop-scan" class="close-btn">Stop Scanning</button>
+                    </div>
+                </section>
+            </main>
+
+            <nav class="bottom-nav">
+                <button class="nav-item active" data-target="section-generate">
+                    <span class="nav-icon">✨</span>
+                    <span class="nav-label">Make</span>
+                </button>
+                <button class="nav-item" data-target="section-book">
+                    <span class="nav-icon">📒</span>
+                    <span class="nav-label">Book</span>
+                </button>
+                <button class="nav-item" data-target="section-exchange">
+                    <span class="nav-icon">🤝</span>
+                    <span class="nav-label">Trade</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MODALS (Moved outside app-container to fix positioning) -->
+    
+    <!-- STICKER DETAIL MODAL -->
+    <div id="detail-modal" class="modal hidden">
+        <div class="modal-content detail-content">
+            <button id="btn-close-detail" class="close-btn-top" type="button">×</button>
+            <div class="detail-image-container">
+                <img id="detail-img" src="" alt="Sticker Detail">
+            </div>
+            
+            <!-- Default View -->
+            <div id="detail-actions-default" class="detail-actions">
+                <button id="btn-delete-sticker" class="action-btn text-btn danger-text-btn" type="button">Discard</button>
+            </div>
+
+            <!-- Confirmation View -->
+            <div id="detail-actions-confirm" class="detail-actions hidden" style="flex-direction: column; gap: 10px;">
+                <p style="color: #666; font-size: 0.9rem; margin: 0;">Really delete?</p>
+                <div style="display: flex; gap: 15px;">
+                    <button id="btn-confirm-delete" class="action-btn text-btn danger-text-btn" type="button" style="font-weight: bold;">Yes, Delete</button>
+                    <button id="btn-cancel-delete" class="action-btn text-btn" type="button">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SELECTION MODAL (If it exists, move it too) -->
+    <div id="selection-modal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Select Sticker to Give</h3>
+            <div id="modal-sticker-grid" class="sticker-grid small-grid"></div>
+            <button id="btn-close-modal" class="close-btn">Cancel</button>
+        </div>
     </div>
 
     <script src="app.js"></script>
