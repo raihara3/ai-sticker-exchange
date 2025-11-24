@@ -236,96 +236,58 @@ section {
 }
 
 /* Exchange */
-.exchange-area {
+/* Exchange Modes */
+.exchange-menu {
     display: flex;
-    align-items: center;
-    justify-content: space-between;
+    flex-direction: column;
+    gap: 15px;
     width: 100%;
-    margin: 40px 0;
+    align-items: center;
+    margin-top: 20px;
 }
 
-.exchange-slot {
-    width: 120px;
-    height: 140px;
-    background: rgba(255,255,255,0.8);
-    border: 3px dashed #ccc;
-    border-radius: 15px;
+.exchange-mode {
+    width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
-    position: relative;
-    cursor: pointer;
+    margin-top: 20px;
 }
 
-.exchange-slot p {
-    position: absolute;
-    top: -25px;
-    font-weight: bold;
-    color: #5f27cd;
-}
-
-.exchange-slot img {
-    max-width: 90%;
-    max-height: 90%;
-    z-index: 2;
-}
-
-.slot-placeholder {
-    color: #ccc;
-    font-weight: bold;
-    font-size: 1.2rem;
-}
-
-.exchange-arrow {
-    font-size: 2rem;
-    color: #ff9ff3;
-    font-weight: bold;
-}
-
-/* Modal */
-.modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
-
-.modal-content {
+#qrcode {
     background: white;
-    padding: 20px;
-    border-radius: 20px;
-    width: 90%;
-    max-width: 350px;
-    max-height: 80vh;
-    display: flex;
-    flex-direction: column;
+    padding: 15px;
+    border-radius: 10px;
+    margin: 20px 0;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 
-.modal-content h3 {
+#qrcode img {
+    margin: 0 auto;
+}
+
+.instruction {
     text-align: center;
-    margin-bottom: 15px;
+    margin: 10px 0;
     color: #5f27cd;
+    font-weight: bold;
 }
 
-.small-grid {
-    overflow-y: auto;
-    max-height: 300px;
+#reader {
+    border-radius: 15px;
+    overflow: hidden;
+    border: 3px solid #ff9ff3;
 }
 
 .close-btn {
     margin-top: 15px;
-    padding: 10px;
+    padding: 10px 20px;
     background: #eee;
     border: none;
     border-radius: 10px;
     cursor: pointer;
+    font-weight: bold;
+    color: #555;
 }
 
 /* Bottom Nav */

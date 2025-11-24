@@ -26,15 +26,19 @@ const btnSaveSticker = document.getElementById('btn-save-sticker');
 const stickerGrid = document.getElementById('sticker-grid');
 
 // Exchange Elements
-const giveSlot = document.getElementById('give-slot');
-const givePlaceholder = document.getElementById('give-placeholder');
-const giveImg = document.getElementById('give-img');
-const receiveSlot = document.getElementById('receive-slot');
-const receiveImg = document.getElementById('receive-img');
-const btnExchange = document.getElementById('btn-exchange');
-const modal = document.getElementById('selection-modal');
-const modalGrid = document.getElementById('modal-sticker-grid');
-const btnCloseModal = document.getElementById('btn-close-modal');
+// Exchange Elements
+const btnModeGive = document.getElementById('btn-mode-give');
+const btnModeGet = document.getElementById('btn-mode-get');
+const exchangeGive = document.getElementById('exchange-give');
+const exchangeGet = document.getElementById('exchange-get');
+const giveStickerGrid = document.getElementById('give-sticker-grid');
+const qrDisplayArea = document.getElementById('qr-display-area');
+const qrcodeContainer = document.getElementById('qrcode');
+const btnCloseQr = document.getElementById('btn-close-qr');
+const btnStopScan = document.getElementById('btn-stop-scan');
+const scanStatus = document.getElementById('scan-status');
+
+let html5QrCode = null;
 const stickerPrompt = document.getElementById('sticker-prompt');
 
 let selectedStickerIndex = null;
@@ -70,6 +74,12 @@ function setupNavigation() {
 
             // Switch Section
             const targetId = btn.dataset.target;
+            
+            // Stop scanning if leaving exchange
+            if (targetId !== 'section-exchange') {
+                stopScanning();
+            }
+
             Object.values(sections).forEach(sec => sec.classList.add('hidden'));
             document.getElementById(targetId).classList.remove('hidden');
             document.getElementById(targetId).classList.add('active-section');
@@ -174,83 +184,132 @@ function renderStickerBook() {
 }
 
 // Exchange Logic
+// Exchange Logic
 function setupExchange() {
-    giveSlot.addEventListener('click', openSelectionModal);
-    btnCloseModal.addEventListener('click', () => modal.classList.add('hidden'));
-    
-    btnExchange.addEventListener('click', executeExchange);
+    btnModeGive.addEventListener('click', showGiveMode);
+    btnModeGet.addEventListener('click', showGetMode);
+    btnCloseQr.addEventListener('click', () => {
+        qrDisplayArea.classList.add('hidden');
+        giveStickerGrid.classList.remove('hidden');
+    });
+    btnStopScan.addEventListener('click', stopScanning);
 }
 
-function openSelectionModal() {
-    modal.classList.remove('hidden');
-    modalGrid.innerHTML = '';
+function showGiveMode() {
+    exchangeGive.classList.remove('hidden');
+    exchangeGet.classList.add('hidden');
+    qrDisplayArea.classList.add('hidden');
+    giveStickerGrid.classList.remove('hidden');
     
+    renderGiveGrid();
+}
+
+function renderGiveGrid() {
+    giveStickerGrid.innerHTML = '';
     if (state.inventory.length === 0) {
-        modalGrid.innerHTML = '<p style="text-align:center; width:100%;">You have no stickers to trade!</p>';
+        giveStickerGrid.innerHTML = '<p style="text-align:center; width:100%;">No stickers to give!</p>';
         return;
     }
 
-    state.inventory.forEach((sticker, index) => {
+    state.inventory.forEach(sticker => {
         const el = document.createElement('div');
         el.className = 'sticker-item';
         el.innerHTML = `<img src="${sticker.src}" alt="Sticker">`;
-        el.onclick = () => selectStickerToGive(index, sticker);
-        modalGrid.appendChild(el);
+        el.onclick = () => generateQR(sticker);
+        giveStickerGrid.appendChild(el);
     });
 }
 
-function selectStickerToGive(index, sticker) {
-    selectedStickerIndex = index;
-    
-    // Update UI
-    givePlaceholder.classList.add('hidden');
-    giveImg.src = sticker.src;
-    giveImg.classList.remove('hidden');
-    
-    modal.classList.add('hidden');
-    btnExchange.disabled = false;
-    
-    // Reset receive slot
-    receiveImg.classList.add('hidden');
-    receiveImg.src = '';
+function generateQR(sticker) {
+    giveStickerGrid.classList.add('hidden');
+    qrDisplayArea.classList.remove('hidden');
+    qrcodeContainer.innerHTML = '';
+
+    // Create JSON data for the sticker
+    const data = JSON.stringify({
+        id: sticker.id,
+        src: sticker.src,
+        prompt: sticker.prompt || 'Unknown'
+    });
+
+    new QRCode(qrcodeContainer, {
+        text: data,
+        width: 200,
+        height: 200
+    });
 }
 
-function executeExchange() {
-    if (selectedStickerIndex === null) return;
+function showGetMode() {
+    exchangeGive.classList.add('hidden');
+    exchangeGet.classList.remove('hidden');
+    startScanning();
+}
 
-    btnExchange.disabled = true;
-    btnExchange.innerText = "TRADING...";
+function startScanning() {
+    if (html5QrCode) {
+        // Already running
+        return;
+    }
 
-    setTimeout(() => {
-        // Remove old sticker
-        state.inventory.splice(selectedStickerIndex, 1);
-        
-        // Get new random sticker
-        const randomSticker = ASSETS[Math.floor(Math.random() * ASSETS.length)];
-        state.inventory.push({
-            id: Date.now(),
-            src: randomSticker,
-            date: new Date().toISOString()
+    scanStatus.innerText = "Requesting camera access...";
+    
+    html5QrCode = new Html5Qrcode("reader");
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    html5QrCode.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+    .catch(err => {
+        console.error(err);
+        scanStatus.innerText = "Camera error: " + err;
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost') {
+            scanStatus.innerText += " (HTTPS required)";
+        }
+    });
+}
+
+function onScanSuccess(decodedText, decodedResult) {
+    try {
+        const data = JSON.parse(decodedText);
+        if (data.src) {
+            // Check for duplicate
+            const exists = state.inventory.some(s => s.id === data.id || s.src === data.src);
+            
+            if (exists) {
+                alert('You already have this sticker!');
+            } else {
+                state.inventory.push({
+                    id: Date.now(), // New ID for the receiver
+                    src: data.src,
+                    date: new Date().toISOString(),
+                    prompt: data.prompt
+                });
+                saveState();
+                alert('Sticker Received! ✨');
+                renderStickerBook();
+            }
+            
+            stopScanning();
+            // Go to book
+            document.querySelector('[data-target="section-book"]').click();
+        }
+    } catch (e) {
+        console.error('Invalid QR', e);
+    }
+}
+
+function onScanFailure(error) {
+    // console.warn(`Code scan error = ${error}`);
+}
+
+function stopScanning() {
+    if (html5QrCode) {
+        html5QrCode.stop().then(() => {
+            html5QrCode.clear();
+            html5QrCode = null;
+            scanStatus.innerText = "Stopped";
+        }).catch(err => {
+            console.error("Failed to stop", err);
         });
-        
-        saveState();
-
-        // Show result
-        receiveImg.src = randomSticker;
-        receiveImg.classList.remove('hidden');
-        
-        btnExchange.innerText = "TRADE COMPLETE!";
-        
-        setTimeout(() => {
-            // Reset UI
-            selectedStickerIndex = null;
-            giveImg.classList.add('hidden');
-            givePlaceholder.classList.remove('hidden');
-            btnExchange.innerText = "EXCHANGE!";
-            btnExchange.disabled = true;
-        }, 2000);
-
-    }, 1500);
+    }
 }
 
 // Start
