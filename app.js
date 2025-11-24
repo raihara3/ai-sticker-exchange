@@ -35,6 +35,7 @@ const btnExchange = document.getElementById('btn-exchange');
 const modal = document.getElementById('selection-modal');
 const modalGrid = document.getElementById('modal-sticker-grid');
 const btnCloseModal = document.getElementById('btn-close-modal');
+const stickerPrompt = document.getElementById('sticker-prompt');
 
 let selectedStickerIndex = null;
 
@@ -78,31 +79,69 @@ function setupNavigation() {
 
 // Generation Logic
 function setupGeneration() {
-    btnGenerate.addEventListener('click', () => {
-        // Animation simulation
+    btnGenerate.addEventListener('click', async () => {
+        const promptText = stickerPrompt.value.trim();
+
+        if (!promptText) {
+            alert('どんなシールを作るか教えてね！');
+            stickerPrompt.focus();
+            return;
+        }
+
+        // UI Update
         btnGenerate.disabled = true;
-        btnGenerate.innerText = "GENERATING...";
+        btnGenerate.innerHTML = '<span class="btn-icon">⏳</span> GENERATING...';
+        stickerPrompt.disabled = true;
         
-        // Simulate network/processing delay
-        setTimeout(() => {
-            const randomSticker = ASSETS[Math.floor(Math.random() * ASSETS.length)];
-            
-            // Show result
-            newStickerImg.src = randomSticker;
-            generationResult.classList.remove('hidden');
-            btnGenerate.classList.add('hidden');
-            
-            // Setup save button
-            btnSaveSticker.onclick = () => {
-                state.inventory.push({
-                    id: Date.now(),
-                    src: randomSticker,
-                    date: new Date().toISOString()
-                });
-                saveState();
-                resetGeneration();
+        try {
+            // Use Pollinations.ai (Free, No Key)
+            // System prompt: Heisei style, sticker, white background
+            // Using 'flux' model for better quality
+            // Translate keywords to English for better model understanding
+            const systemPrompt = "sticker style, vector illustration, white background, flat color, pop, no shadow";
+            const fullPrompt = `${systemPrompt}, ${promptText}`;
+            const encodedPrompt = encodeURIComponent(fullPrompt);
+            const seed = Math.floor(Math.random() * 10000);
+            const url = `https://pollinations.ai/p/${encodedPrompt}?width=1024&height=1024&seed=${seed}&model=flux`;
+
+            // Load image directly (Bypass CORS fetch restriction)
+            const tempImg = new Image();
+            tempImg.onload = () => {
+                // Show result
+                newStickerImg.src = url;
+                generationResult.classList.remove('hidden');
+                btnGenerate.classList.add('hidden');
+                
+                // Setup save button
+                btnSaveSticker.onclick = () => {
+                    state.inventory.push({
+                        id: Date.now(),
+                        src: url, // Save the URL instead of Base64
+                        date: new Date().toISOString(),
+                        prompt: promptText
+                    });
+                    saveState();
+                    resetGeneration();
+                };
             };
-        }, 1500);
+            
+            tempImg.onerror = () => {
+                console.error('Image load failed');
+                alert('画像の生成に失敗しました。もう一度試してみてください。');
+                btnGenerate.disabled = false;
+                btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
+                stickerPrompt.disabled = false;
+            };
+
+            tempImg.src = url;
+
+        } catch (error) {
+            console.error('Generation setup failed:', error);
+            alert('エラーが発生しました: ' + error.message);
+            btnGenerate.disabled = false;
+            btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
+            stickerPrompt.disabled = false;
+        }
     });
 }
 
@@ -111,6 +150,7 @@ function resetGeneration() {
     btnGenerate.classList.remove('hidden');
     btnGenerate.disabled = false;
     btnGenerate.innerHTML = '<span class="btn-icon">✨</span> MAKE STICKER <span class="btn-icon">✨</span>';
+    stickerPrompt.value = ''; // Clear prompt
     
     // Switch to book view to show the new sticker
     document.querySelector('[data-target="section-book"]').click();

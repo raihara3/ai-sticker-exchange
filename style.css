@@ -361,3 +361,75 @@ section {
     font-size: 0.7rem;
     font-weight: bold;
 }
+
+/* Additions for Input and Settings */
+.input-container {
+    width: 100%;
+    max-width: 280px;
+    margin-bottom: 15px;
+}
+
+.heisei-input {
+    width: 100%;
+    padding: 12px;
+    border: 3px solid #ff9ff3;
+    border-radius: 15px;
+    font-family: var(--font-main);
+    font-size: 1rem;
+    outline: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #5f27cd;
+    transition: all 0.2s;
+}
+
+.heisei-input:focus {
+    border-color: #feca57;
+    box-shadow: 0 0 10px rgba(254, 202, 87, 0.5);
+}
+
+.settings-btn {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+}
+
+.settings-btn:hover {
+    opacity: 1;
+}
+
+.settings-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.settings-form label {
+    font-weight: bold;
+    color: #5f27cd;
+}
+
+.note {
+    font-size: 0.8rem;
+    color: #888;
+    margin-top: 5px;
+}
+
+.small-btn {
+    padding: 10px 20px;
+    font-size: 1rem;
+    margin-top: 0;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
