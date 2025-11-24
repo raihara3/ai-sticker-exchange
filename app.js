@@ -54,8 +54,14 @@ const detailActionsConfirm = document.getElementById('detail-actions-confirm');
 const btnConfirmDelete = document.getElementById('btn-confirm-delete');
 const btnCancelDelete = document.getElementById('btn-cancel-delete');
 
+// Give Confirmation Elements
+const giveConfirmation = document.getElementById('give-confirmation');
+const btnConfirmGive = document.getElementById('btn-confirm-give');
+const btnCancelGive = document.getElementById('btn-cancel-give');
+
 let selectedStickerIndex = null;
 let currentDetailIndex = null;
+let stickerToGive = null;
 
 // Initialization
 function init() {
@@ -258,14 +264,20 @@ function setupExchange() {
     btnCloseQr.addEventListener('click', () => {
         qrDisplayArea.classList.add('hidden');
         giveStickerGrid.classList.remove('hidden');
+        renderGiveGrid(); // Re-render to show updated inventory
     });
     btnStopScan.addEventListener('click', stopScanning);
+    
+    // Give Confirmation Events
+    btnConfirmGive.addEventListener('click', executeGive);
+    btnCancelGive.addEventListener('click', cancelGive);
 }
 
 function showGiveMode() {
     exchangeGive.classList.remove('hidden');
     exchangeGet.classList.add('hidden');
     qrDisplayArea.classList.add('hidden');
+    giveConfirmation.classList.add('hidden');
     giveStickerGrid.classList.remove('hidden');
     
     renderGiveGrid();
@@ -282,13 +294,36 @@ function renderGiveGrid() {
         const el = document.createElement('div');
         el.className = 'sticker-item';
         el.innerHTML = `<img src="${sticker.src}" alt="Sticker">`;
-        el.onclick = () => generateQR(sticker);
+        el.onclick = () => confirmGive(sticker);
         giveStickerGrid.appendChild(el);
     });
 }
 
-function generateQR(sticker) {
+function confirmGive(sticker) {
+    stickerToGive = sticker;
     giveStickerGrid.classList.add('hidden');
+    giveConfirmation.classList.remove('hidden');
+}
+
+function cancelGive() {
+    stickerToGive = null;
+    giveConfirmation.classList.add('hidden');
+    giveStickerGrid.classList.remove('hidden');
+}
+
+function executeGive() {
+    if (!stickerToGive) return;
+    
+    // Remove from inventory
+    state.inventory = state.inventory.filter(s => s.id !== stickerToGive.id);
+    saveState();
+    
+    // Show QR
+    giveConfirmation.classList.add('hidden');
+    generateQR(stickerToGive);
+}
+
+function generateQR(sticker) {
     qrDisplayArea.classList.remove('hidden');
     qrcodeContainer.innerHTML = '';
 

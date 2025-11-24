@@ -76,6 +76,15 @@
                         <h3>Select a sticker to give</h3>
                         <div id="give-sticker-grid" class="sticker-grid small-grid"></div>
                         
+                    <div id="give-confirmation" class="hidden" style="text-align: center; padding: 20px;">
+                        <p style="color: #ff6b6b; font-weight: bold; margin-bottom: 15px;">⚠️ Warning</p>
+                        <p style="margin-bottom: 20px;">This sticker will be removed from your book once you generate the QR code.<br>Are you sure?</p>
+                        <div style="display: flex; gap: 15px; justify-content: center;">
+                            <button id="btn-confirm-give" class="action-btn primary-btn small-btn">Yes, Give</button>
+                            <button id="btn-cancel-give" class="action-btn secondary-btn small-btn">Cancel</button>
+                        </div>
+                    </div>
+
                         <div id="qr-display-area" class="hidden">
                             <div id="qrcode"></div>
                             <p class="instruction">Scan this with another device!</p>
